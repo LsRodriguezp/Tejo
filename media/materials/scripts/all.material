@@ -1,0 +1,120 @@
+// Materiales 
+material BaseBrown {
+    technique {
+        pass {
+            ambient 0.5 0.3 0.1
+            diffuse 0.7 0.4 0.2
+            specular 0.1 0.1 0.1 12.5
+        }
+    }
+}
+
+material BaseRed {
+    technique {
+        pass {
+            ambient 0.8 0.0 0.0
+            diffuse 0.6 0.0 0.0
+            specular 0.5 0.0 0.0 12.5
+        }
+    }
+}
+
+material BaseYellow {
+    technique {
+        pass {
+            ambient 0.8 0.7 0.0
+            diffuse 0.6 0.5 0.0
+            specular 0.5 0.5 0.0 12.5
+        }
+    }
+}
+
+material BaseGreen {
+    technique {
+        pass {
+            scene_blend alpha_blend
+            depth_check on
+            depth_write off
+            cull_hardware none
+            line_width 2
+            ambient 0.0 0.6 0.0
+            diffuse 0.0 0.8 0.0
+        }
+    }
+}
+
+// Materiales del proyecto original (usados por ti ahora)
+material field {
+    technique {
+        pass {
+            texture_unit {
+                texture arcilla.jpg
+            }
+        }
+    }
+}
+
+material tejo_metal {
+    receive_shadows on
+    technique {
+        pass {
+            lighting on
+            ambient 0.25 0.25 0.25 1.0
+            diffuse 0.7 0.7 0.7 1.0
+            specular 1.0 1.0 1.0 1.0 64
+            emissive 0.0 0.0 0.0 1.0
+            depth_write on
+            depth_check on
+            cull_hardware clockwise
+            shading gouraud
+            texture_unit {
+                texture tejo.jpg
+            }
+        }
+    }
+}
+
+material backboard_wood {
+    receive_shadows on
+    technique {
+        pass {
+            lighting on
+            ambient 0.6 0.5 0.4 1.0
+            diffuse 0.7 0.6 0.5 1.0
+            specular 0.2 0.2 0.2 1.0 12.0
+            emissive 0 0 0 1.0
+            depth_check on
+            depth_write on
+            cull_hardware clockwise
+            shading gouraud
+            texture_unit {
+                texture wood.jpg
+                filtering anisotropic
+                max_anisotropy 8
+                tex_address_mode clamp
+            }
+        }
+    }
+}
+
+material debug_material {
+    technique {
+        pass {
+            diffuse 0 1 0 0.3
+            ambient 0 1 0
+            self_illumination 0 1 0
+            scene_blend alpha_blend
+            depth_write off
+        }
+    }
+}
+
+material ground {
+    technique {
+        pass {
+            texture_unit {
+                texture ground_1.jpg
+            }
+        }
+    }
+}
