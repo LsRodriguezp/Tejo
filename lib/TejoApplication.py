@@ -207,15 +207,15 @@ class TejoApplication(BaseApplicationWithVTK):
         # Verificar colisión con mechas
         mecha_hits = [c for c in contacts if 'mecha_' in c]
         if mecha_hits:
-            points += 3  # 3 puntos por cada mecha
+            points += 2  # 2 puntos por cada mecha
 
         # Verificar colisión con bocín
         if 'bocin' in contacts:
-            points += 6  # 6 puntos por bocín
+            points += 5  # 5 puntos por bocín
 
         # Verificar si fue moniña (mecha + bocín)
         if len(mecha_hits) >= 1 and 'bocin' in contacts:
-            points = 9  # Moniña
+            points = 10  # Moniña
 
         self.score += points
         print(f"Puntos: {points} | Total: {self.score}")
