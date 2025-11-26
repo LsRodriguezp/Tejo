@@ -1,3 +1,9 @@
 tejo_env/
 __pycache__/
 *.pyc
+
+venv/
+*.pyc
+__pycache__/
+*.swp
+.DS_Store
