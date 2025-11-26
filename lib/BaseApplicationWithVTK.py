@@ -93,36 +93,76 @@ class BaseApplicationWithVTK(BaseApplication):
         box.Update()
         return self._parametric_data_from_polydata(box.GetOutput())
 
-    def _create_vtk_cone(self, height, radius, truncate_ratio=1.3):
+    def _create_vtk_cone(self, radius, height, resolution=32):
         cone = vtk.vtkConeSource()
-        cone.SetHeight(height)
         cone.SetRadius(radius)
-        cone.SetResolution(50)
+        cone.SetHeight(height)
+        cone.SetResolution(int(resolution))
+        cone.SetDirection(0, 1, 0)  # Orientado hacia +Y
+        cone.CappingOn()
         cone.Update()
 
-        # Rotar con transform
-        transform = vtk.vtkTransform()
-        transform.RotateX(-90)
-        transformFilter = vtk.vtkTransformPolyDataFilter()
-        transformFilter.SetInputConnection(cone.GetOutputPort())
-        transformFilter.SetTransform(transform)
-        transformFilter.Update()
+        poly = cone.GetOutput()
 
-        # Normales y texturas
-        normal_filter = vtk.vtkPolyDataNormals()
-        normal_filter.SetInputConnection(transformFilter.GetOutputPort())
-        normal_filter.ComputePointNormalsOn()
-        normal_filter.ComputeCellNormalsOff()
-        normal_filter.ConsistencyOn()
-        normal_filter.AutoOrientNormalsOn()
-        normal_filter.SplittingOff()
-        normal_filter.Update()
+        # Evitar UVs vacíos o corruptos (ya que algunos materiales no usan textura)
+        if poly.GetPointData().GetTCoords():
+            poly.GetPointData().SetTCoords(None)
 
-        texture_filter = vtk.vtkTextureMapToCylinder()
-        texture_filter.SetInputData(normal_filter.GetOutput())
-        texture_filter.Update()
+        # Regenerar normales para tener normales validas
+        normals = vtk.vtkPolyDataNormals()
+        normals.SetInputData(poly)
+        normals.ComputePointNormalsOn()
+        normals.SplittingOff()
+        normals.Update()
 
-        mesh = texture_filter.GetOutput()
-        return self._parametric_data_from_polydata(mesh)
+        # Convertir polydata a (P, N, T, C)
+        return self._parametric_data_from_polydata(normals.GetOutput())
+    
+    def _create_tejo_model(self):
+        import vtk
 
-# end class
+        radius = 0.085   # radio realista
+        height = 0.018   # altura bajita (tejo plano)
+        resolution = 64
+
+        # Base: un cilindro
+        cylinder = vtk.vtkCylinderSource()
+        cylinder.SetRadius(radius)
+        cylinder.SetHeight(height)
+        cylinder.SetResolution(resolution)
+        cylinder.CappingOn()
+        cylinder.Update()
+
+        cyl = cylinder.GetOutput()
+
+        # Suavizado para bordes redondeados
+        smooth = vtk.vtkSmoothPolyDataFilter()
+        smooth.SetInputData(cyl)
+        smooth.SetNumberOfIterations(30)
+        smooth.SetRelaxationFactor(0.05)
+        smooth.FeatureEdgeSmoothingOff()
+        smooth.BoundarySmoothingOn()
+        smooth.Update()
+
+        smoothed = smooth.GetOutput()
+
+        # Normales suaves
+        normals = vtk.vtkPolyDataNormals()
+        normals.SetInputData(smoothed)
+        normals.ComputePointNormalsOn()
+        normals.ComputeCellNormalsOff()
+        normals.SplittingOff()
+        normals.Update()
+
+        poly = normals.GetOutput()
+
+        # UV mapping cilíndrico (evita seams)
+        tex = vtk.vtkTextureMapToCylinder()
+        tex.SetInputData(poly)
+        tex.PreventSeamOn()
+        tex.Update()
+
+        uv_mapped = tex.GetOutput()
+
+        # Convertimos a P, N, T, C
+        return self._parametric_data_from_polydata(uv_mapped)

@@ -8,6 +8,9 @@ import sys
 import pybullet
 import math
 from .BaseApplicationWithVTK import BaseApplicationWithVTK
+import Ogre.Bites as OgreBites
+import Ogre
+from .BaseApplication import BaseApplication
 from .TejoListener import TejoListener
 
 class TejoApplication(BaseApplicationWithVTK):
@@ -114,13 +117,16 @@ class TejoApplication(BaseApplicationWithVTK):
             self.mecha_nodes[f'mecha_{i}'] = node
 
     def _create_bocin(self):
-        # Bocín (círculo en el centro)
         data = self._create_vtk_cylinder(0.05, 0.01)
-        self.bocin_node = self._createManualObject(data, "Bocin", "target_material")  # O usa "BaseYellow"
+        self.bocin_node = self._createManualObject(data, "Bocin", "target_material")
         self.bocin_node.setPosition(0, 0.6, 0)
 
-        # Collider cilíndrico para el bocín
-        shape = pybullet.createCollisionShape(pybullet.GEOM_CYLINDER, radius=0.05, height=0.01)
+        # Collider seguro
+        shape = pybullet.createCollisionShape(
+            pybullet.GEOM_BOX,
+            halfExtents=[0.05, 0.005, 0.05]
+        )
+
         body = pybullet.createMultiBody(
             baseMass=0.0,
             baseCollisionShapeIndex=shape,
@@ -129,16 +135,22 @@ class TejoApplication(BaseApplicationWithVTK):
         pybullet.changeDynamics(body, -1, restitution=0.5, lateralFriction=0.6)
         self.static_bodies['bocin'] = body
 
+
     def _create_tejo(self):
-        # Tejo (cono pequeño)
-        data = self._create_vtk_cone(0.08, 0.03, 1.3)
+
+        # modelo gráfico
+        data = self._create_tejo_model()
         self.tejo_node = self._createManualObject(data, "Tejo", "tejo_metal")
-        self.tejo_node.setScale(0.8, 0.8, 0.8)
+
+        # posición inicial gráfica
+        self.tejo_node.setPosition(*self.launch_pos)
+
+    
 
     def update_tejo_position(self):
         if self.tejo_node:
             self.tejo_node.setPosition(*self.launch_pos)
-            # Rotación horizontal (opcional)
+            # Rotación horizontal 
             q = Ogre.Quaternion(Ogre.Radian(math.radians(-self.angle_horiz)), Ogre.Vector3(0, 1, 0))
             self.tejo_node.setOrientation(q)
 
@@ -150,13 +162,17 @@ class TejoApplication(BaseApplicationWithVTK):
         self.t = 0.0
 
         # Crear cuerpo dinámico en PyBullet
-        shape = pybullet.createCollisionShape(pybullet.GEOM_SPHERE, radius=0.03)
-        mass = 0.017  # masa realista del tejo
+        shape = pybullet.createCollisionShape(
+        pybullet.GEOM_SPHERE,
+        radius=0.085
+            )
+        mass = 0.017
         self.moving_body = pybullet.createMultiBody(
-            baseMass=mass,
-            baseCollisionShapeIndex=shape,
-            basePosition=self.launch_pos
-        )
+        baseMass=mass,
+        baseCollisionShapeIndex=shape,
+        basePosition=self.launch_pos
+    )
+
         pybullet.changeDynamics(self.moving_body, -1, restitution=0.5, lateralFriction=0.6)
 
         # Calcular velocidad inicial

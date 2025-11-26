@@ -5,7 +5,6 @@
 # Exportar clases principales 
 from .BaseApplication import BaseApplication
 from .BaseApplicationWithVTK import BaseApplicationWithVTK
-from .BaseListener import BaseListener
 from .TejoApplication import TejoApplication
 from .TejoListener import TejoListener
 

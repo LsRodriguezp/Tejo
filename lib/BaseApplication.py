@@ -4,6 +4,9 @@
 ## -------------------------------------------------------------------------
 
 import os, sys, Ogre, Ogre.Bites as OgreBites
+from .BaseListener import BaseListener
+
+
 
 class BaseApplication(OgreBites.ApplicationContext):
 

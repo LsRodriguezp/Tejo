@@ -1,4 +1,25 @@
-// Materiales 
+// Materiales básicos ----------------------------------------------
+
+material red_material {
+    technique {
+        pass {
+            ambient 0.8 0.0 0.0
+            diffuse 0.6 0.0 0.0
+            specular 0.5 0.0 0.0 12.5
+        }
+    }
+}
+
+material target_material {
+    technique {
+        pass {
+            ambient 0.8 0.7 0.0
+            diffuse 0.6 0.5 0.0
+            specular 0.5 0.5 0.0 12.5
+        }
+    }
+}
+
 material BaseBrown {
     technique {
         pass {
@@ -43,7 +64,10 @@ material BaseGreen {
     }
 }
 
-// Materiales del proyecto original (usados por ti ahora)
+// -----------------------------------------------------------------
+// Materiales de resources
+// -----------------------------------------------------------------
+
 material field {
     technique {
         pass {
@@ -54,25 +78,38 @@ material field {
     }
 }
 
+// -----------------------------------------------------------------
+//  TEJO
+// -----------------------------------------------------------------
+
 material tejo_metal {
-    receive_shadows on
     technique {
         pass {
             lighting on
-            ambient 0.25 0.25 0.25 1.0
+            ambient 0.4 0.4 0.4 1.0
             diffuse 0.7 0.7 0.7 1.0
-            specular 1.0 1.0 1.0 1.0 64
-            emissive 0.0 0.0 0.0 1.0
+            specular 1.0 1.0 1.0 1.0 32
+
             depth_write on
             depth_check on
-            cull_hardware clockwise
             shading gouraud
+
+            // QUITA ESTO:
+            // cull_hardware clockwise
+
+            // usa esto:
+            cull_hardware none
+
             texture_unit {
-                texture tejo.jpg
+                texture tejo_small.jpg
+                filtering trilinear
             }
         }
     }
 }
+
+
+// -----------------------------------------------------------------
 
 material backboard_wood {
     receive_shadows on
@@ -102,7 +139,7 @@ material debug_material {
         pass {
             diffuse 0 1 0 0.3
             ambient 0 1 0
-            self_illumination 0 1 0
+            emissive 1 1 1
             scene_blend alpha_blend
             depth_write off
         }
