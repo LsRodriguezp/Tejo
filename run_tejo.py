@@ -19,7 +19,7 @@ sys.path.insert(0, os.path.join(project_root, 'lib'))
 from lib.TejoApplication import TejoApplication
 
 def main():
-    print("🚀 Iniciando Tejo v0.1 (PyBullet + Ogre + VTK)...")
+    print("Iniciando Tejo v0.1...")
     app = TejoApplication()
     app.go()
 
