@@ -192,13 +192,13 @@ class TejoApplication(BaseApplicationWithVTK):
 
         mecha_hits = [c for c in contacts if 'mecha_' in c]
         if mecha_hits:
-            points += 3
+            points += 2
 
         if 'bocin' in contacts:
-            points += 6
+            points += 5
 
         if len(mecha_hits) >= 1 and 'bocin' in contacts:
-            points = 9
+            points = 10
 
         self.score += points
         print(f"Puntos: {points} | Total: {self.score}")
